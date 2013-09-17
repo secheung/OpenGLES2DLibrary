@@ -1,6 +1,9 @@
 package engine.open2d.renderer;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -178,10 +181,13 @@ public class WorldRenderer implements GLSurfaceView.Renderer{
 
 		rendererTool.setHandles(shaders.get(WORLD_SHADER));
 
-		//TODO order planes according to z value
-		for(DrawObject drawObject : drawObjects.values()){
-			if(drawObject.isDrawEnabled()){
-				drawShape(drawObject);
+		synchronized(drawObjects){
+			List<DrawObject> sortedList = new ArrayList<DrawObject>(drawObjects.values());
+			Collections.sort(sortedList, rendererTool.zSorter);
+			for(DrawObject drawObject : sortedList){
+				if(drawObject.isDrawEnabled()){
+					drawShape(drawObject);
+				}
 			}
 		}
 	}

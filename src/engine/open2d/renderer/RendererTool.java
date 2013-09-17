@@ -3,17 +3,33 @@ package engine.open2d.renderer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
-import engine.open2d.draw.Plane;
-import engine.open2d.shader.Shader;
 import android.opengl.GLES20;
 import android.opengl.GLU;
 import android.opengl.Matrix;
 import android.util.Log;
+import engine.open2d.draw.DrawObject;
+import engine.open2d.draw.Plane;
+import engine.open2d.shader.Shader;
 
 public class RendererTool {
+	class ZSorter implements Comparator<DrawObject>{
+
+		@Override
+		public int compare(DrawObject lhs, DrawObject rhs) {
+			if(lhs.getTranslationZ() > rhs .getTranslationZ())
+				return 1;
+			else if(lhs.getTranslationZ() < rhs .getTranslationZ())
+				return -1;
+			
+			return 0;
+		}
+
+	}
+	
 	private final static int BYTES_PER_FLOAT = 4;
 	
 	private float[] modelMatrix = new float[16];
@@ -24,9 +40,12 @@ public class RendererTool {
 	private int viewportHeight;
 	
 	Map<String,Integer> handles;
-
+	public ZSorter zSorter;
+	
+	
 	public RendererTool(){
 		handles = new HashMap<String,Integer>();
+		zSorter = new ZSorter();
 	}
 
 	public float[] getModelMatrix() {
