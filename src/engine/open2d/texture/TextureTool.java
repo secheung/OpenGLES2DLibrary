@@ -43,7 +43,7 @@ public class TextureTool {
 		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, imgSpriteSheet, 0);
 
 		imgSpriteSheet.recycle();
-		
+		System.gc();
 		return textureHandle[0];
 	}
 }
