@@ -10,20 +10,24 @@ import android.opengl.GLES20;
 import android.opengl.GLUtils;
 
 public class TextureTool {
-	static int IMAGE_QUALITY = 1;
-	
 	Context context;
+	int textureQuality;
 	
 	public TextureTool(Context context){
 		this.context = context;
+		textureQuality = 1;
+	}
+	
+	public void setTextureQuality(int textureQuality){
+		this.textureQuality = textureQuality;
 	}
 	
 	public Integer loadTexture(Texture texture){
 		int[] textureHandle = new int[1];
 		
-		BitmapFactory.Options o = new BitmapFactory.Options();
-		o.inSampleSize = IMAGE_QUALITY;
-		Bitmap imgSpriteSheet = BitmapFactory.decodeResource(context.getResources(),texture.getResourceId(),o);
+		BitmapFactory.Options loadOptions = new BitmapFactory.Options();
+		loadOptions.inSampleSize = textureQuality;
+		Bitmap imgSpriteSheet = BitmapFactory.decodeResource(context.getResources(),texture.getResourceId(),loadOptions);
 //		Bitmap imgSpriteSheet = BitmapFactory.decodeResource(context.getResources(),texture.getResourceId());
 
 

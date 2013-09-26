@@ -50,6 +50,10 @@ public class WorldRenderer implements GLSurfaceView.Renderer{
     	textureMap = new SparseIntArray();
     }
 
+    public void setTextureQuality(int quality){
+    	textureTool.setTextureQuality(quality);
+    }
+    
 	public void addDrawShape(DrawObject shape){
 		if(drawObjects.containsKey(shape.name)){
 			Log.w(LOG_PREFIX, ITEM_EXISTS_WARNING+" [shape : "+shape.name+"]");
