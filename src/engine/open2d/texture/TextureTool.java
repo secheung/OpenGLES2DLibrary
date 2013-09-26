@@ -10,6 +10,8 @@ import android.opengl.GLES20;
 import android.opengl.GLUtils;
 
 public class TextureTool {
+	static int IMAGE_QUALITY = 1;
+	
 	Context context;
 	
 	public TextureTool(Context context){
@@ -19,8 +21,10 @@ public class TextureTool {
 	public Integer loadTexture(Texture texture){
 		int[] textureHandle = new int[1];
 		
-//		Bitmap imgSpriteSheet = BitmapFactory.decodeStream(context.getResources().openRawResource(texture.getResourceId()));
-		Bitmap imgSpriteSheet = BitmapFactory.decodeResource(context.getResources(),texture.getResourceId());
+		BitmapFactory.Options o = new BitmapFactory.Options();
+		o.inSampleSize = IMAGE_QUALITY;
+		Bitmap imgSpriteSheet = BitmapFactory.decodeResource(context.getResources(),texture.getResourceId(),o);
+//		Bitmap imgSpriteSheet = BitmapFactory.decodeResource(context.getResources(),texture.getResourceId());
 
 
 		GLES20.glDeleteTextures(1,textureHandle,0);
