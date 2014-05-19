@@ -121,7 +121,9 @@ public class WorldRenderer implements GLSurfaceView.Renderer{
 		
 	    for(DrawObject shape : drawObjects.values()){
 	    	Texture texture = ((Plane)shape).getTexture();
-    		textureMap.put(texture.getResourceId(), textureTool.loadTexture(texture));
+	    	if(texture != null){
+	    		textureMap.put(texture.getResourceId(), textureTool.loadTexture(texture));
+	    	}
 	    }
 	}
 	
@@ -130,11 +132,11 @@ public class WorldRenderer implements GLSurfaceView.Renderer{
 		initSetup();
 	}
 	
-	public void drawObject(DrawObject drawObject){
+	public void updateDrawObject(DrawObject drawObject){
 		drawObject.update();
 	}
 	
-	public void drawObject(DrawObject drawObj, float x, float y, float z){
+	public void updateDrawObject(DrawObject drawObj, float x, float y, float z){
 		drawObj.setTranslationX(x);
 		drawObj.setTranslationY(y);
 		drawObj.setTranslationZ(z);
@@ -210,6 +212,7 @@ public class WorldRenderer implements GLSurfaceView.Renderer{
 			rendererTool.enableHandles("a_Position", positionData, Plane.POSITION_DATA_SIZE);
 			rendererTool.enableHandles("a_Color", colorData, Plane.COLOR_DATA_SIZE);
 			rendererTool.enableHandles("a_Normal", normalData, Plane.NORMAL_DATA_SIZE);
+			rendererTool.enableHandles("a_useTexture",((Plane)drawObject).getUseTexture(),Plane.USE_TEXTURE_SIZE);
 			
 			Plane plane = (Plane)drawObject;
 		    if(!(plane.getTexture() == null)){
@@ -235,7 +238,7 @@ public class WorldRenderer implements GLSurfaceView.Renderer{
 	    int mvpMatrixHandle = handles.get("u_MVPMatrix");
         
 	    rendererTool.translateModelMatrix(drawObject.getTranslationX(),drawObject.getTranslationY(),drawObject.getTranslationZ());
-        
+	    
 		GLES20.glUniformMatrix4fv(mvMatrixHandle, 1, false, rendererTool.getMVMatrix(), 0);
 		GLES20.glUniformMatrix4fv(mvpMatrixHandle, 1, false, rendererTool.getMVPMatrix(), 0);
 

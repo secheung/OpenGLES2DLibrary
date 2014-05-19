@@ -21,7 +21,7 @@ public abstract class DrawObject {
     protected float scaleY;
     protected float scaleZ;
     
-    protected abstract void drawObjectInit(String name, float x, float y, float z);
+    protected abstract void drawObjectInit(String name);
     public abstract void update();
     
 	public void drawEnable(){

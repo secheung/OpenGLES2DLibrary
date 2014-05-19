@@ -119,6 +119,16 @@ public class RendererTool {
         GLES20.glVertexAttribPointer(handle, dataElementSize, GLES20.GL_FLOAT, false, 0, buffer);
 		GLES20.glEnableVertexAttribArray(handle);
 	}
+
+	public void enableHandles(String attribute, float data, int dataElementSize){
+		int handle = handles.get(attribute);
+        FloatBuffer buffer = ByteBuffer.allocateDirect(BYTES_PER_FLOAT)
+        								 .order(ByteOrder.nativeOrder())
+        								 .asFloatBuffer();
+        buffer.put(data).position(0);
+        GLES20.glVertexAttrib1fv(handle, buffer);
+		//GLES20.glEnableVertexAttribArray(handle);
+	}
 	
 	public float[] screenUnProjection(float x, float y, float z){
 //		float[] modelView = getMVMatrix();  // use model view if want to include translation applied to models
