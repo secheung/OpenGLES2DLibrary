@@ -2,7 +2,10 @@ package engine.open2d.renderer;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -36,7 +39,8 @@ public class WorldRenderer implements GLSurfaceView.Renderer{
 	TextureTool textureTool;
 
 	private LinkedHashMap<String,Shader> shaders;
-	private LinkedHashMap<String,DrawObject> drawObjects;
+	//private LinkedHashMap<String,DrawObject> drawObjects;
+	private LinkedHashSet<DrawObject> drawObjects;
 	private SparseIntArray textureMap;
 
     public WorldRenderer(final Context activityContext) {
@@ -46,7 +50,7 @@ public class WorldRenderer implements GLSurfaceView.Renderer{
     	textureTool = new TextureTool(activityContext);
     	
     	shaders = new LinkedHashMap<String,Shader>();
-    	drawObjects = new LinkedHashMap<String,DrawObject>();
+    	drawObjects = new LinkedHashSet<DrawObject>();
     	textureMap = new SparseIntArray();
     }
 
@@ -55,19 +59,19 @@ public class WorldRenderer implements GLSurfaceView.Renderer{
     }
     
 	public void addDrawShape(DrawObject shape){
-		if(drawObjects.containsKey(shape.name)){
+		if(drawObjects.contains(shape)){
 			Log.w(LOG_PREFIX, ITEM_EXISTS_WARNING+" [shape : "+shape.name+"]");
 			return;
 		}
 
 		synchronized(drawObjects){
-			drawObjects.put(shape.name, shape);
+			drawObjects.add(shape);
 		}
     }
 	
 	public void removeDrawShape(DrawObject shape){
 		synchronized(drawObjects){
-			drawObjects.remove(shape.name);
+			drawObjects.remove(shape);
 		}
 	}
 	
@@ -119,7 +123,10 @@ public class WorldRenderer implements GLSurfaceView.Renderer{
 			return;
 	    }
 		
-	    for(DrawObject shape : drawObjects.values()){
+		Iterator<DrawObject> iterator = drawObjects.iterator();
+		
+	    while(iterator.hasNext() ){
+	    	DrawObject shape = iterator.next();
 	    	Texture texture = ((Plane)shape).getTexture();
 	    	if(texture != null){
 	    		textureMap.put(texture.getResourceId(), textureTool.loadTexture(texture));
@@ -152,8 +159,11 @@ public class WorldRenderer implements GLSurfaceView.Renderer{
 		float y = rendererTool.getViewportHeight() - yCoord;
 		float closestdepth = -1;
 		Plane objSelected=null;
+		
 		synchronized(drawObjects){
-			for(DrawObject drawObj : drawObjects.values()){
+			Iterator<DrawObject> iterator = drawObjects.iterator();
+			while(iterator.hasNext()){
+				DrawObject drawObj = iterator.next();
 				if(!drawObj.isDrawEnabled()){
 					continue;
 				}
@@ -189,7 +199,7 @@ public class WorldRenderer implements GLSurfaceView.Renderer{
 		rendererTool.setHandles(shaders.get(WORLD_SHADER));
 
 		synchronized(drawObjects){
-			List<DrawObject> sortedList = new ArrayList<DrawObject>(drawObjects.values());
+			List<DrawObject> sortedList = new ArrayList<DrawObject>(drawObjects);
 			Collections.sort(sortedList, rendererTool.zSorter);
 			for(DrawObject drawObject : sortedList){
 				if(drawObject.isDrawEnabled()){
