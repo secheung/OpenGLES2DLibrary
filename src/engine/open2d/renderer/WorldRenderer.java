@@ -38,6 +38,11 @@ public class WorldRenderer implements GLSurfaceView.Renderer{
 	ShaderTool shaderTool;
 	TextureTool textureTool;
 
+	private float bgRed = 0.0f;
+	private float bgGreen = 0.0f;
+	private float bgBlue = 0.0f;
+	private float bgAlpha = 0.0f;
+	
 	private LinkedHashMap<String,Shader> shaders;
 	//private LinkedHashMap<String,DrawObject> drawObjects;
 	private LinkedHashSet<DrawObject> drawObjects;
@@ -89,9 +94,16 @@ public class WorldRenderer implements GLSurfaceView.Renderer{
     	shaders.put(ref, shader);
     }
 
+    public void setBackground(float red, float green, float blue, float alpha){
+    	bgRed = red;
+    	bgGreen = green;
+    	bgBlue = blue;
+    	bgAlpha = alpha;
+    }
+    
 	public void initSetup(){
 
-		GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+		GLES20.glClearColor(bgRed, bgGreen, bgBlue, bgAlpha);
 
 		GLES20.glEnable(GLES20.GL_CULL_FACE);
 		GLES20.glEnable(GLES20.GL_DEPTH_TEST);
@@ -106,7 +118,7 @@ public class WorldRenderer implements GLSurfaceView.Renderer{
 		buildShaders();
 		buildObjectTextures();
 	}
-
+	
 	private void buildShaders(){
 	    if(shaders == null || shaders.isEmpty()){
 			Log.w(LOG_PREFIX, NO_ITEM_EXISTS_WARNING +" shaders");
