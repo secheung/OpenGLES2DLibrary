@@ -139,5 +139,18 @@ public abstract class DrawObject {
 	public void setScaleZ(float scaleZ) {
 		this.scaleZ = scaleZ;
 	}
+	
+	public void setColor(float R, float G, float B, float A){
+		float[] colorBox = {
+			    // R, G, B, A
+				R, G, B, A,
+				R, G, B, A,
+				R, G, B, A,
+				R, G, B, A,
+				R, G, B, A,
+				R, G, B, A,
+			};
+		this.colorData = colorBox;
+	}
 
 }
