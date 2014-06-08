@@ -34,6 +34,7 @@ public class WorldRenderer implements GLSurfaceView.Renderer{
 
 	Context activityContext;
 	RendererTool rendererTool;
+	FPSCounter fpsCounter;
 	
 	ShaderTool shaderTool;
 	TextureTool textureTool;
@@ -51,6 +52,7 @@ public class WorldRenderer implements GLSurfaceView.Renderer{
     public WorldRenderer(final Context activityContext) {
     	this.activityContext = activityContext;
     	rendererTool = new RendererTool();
+    	fpsCounter = new FPSCounter();
     	shaderTool = new ShaderTool(activityContext);
     	textureTool = new TextureTool(activityContext);
     	
@@ -59,6 +61,10 @@ public class WorldRenderer implements GLSurfaceView.Renderer{
     	textureMap = new SparseIntArray();
     }
 
+    public void setDrawFPSCounter(boolean drawFPS){
+    	fpsCounter.setDrawFPSCounter(drawFPS);
+    }
+    
     public void setTextureQuality(int quality){
     	textureTool.setTextureQuality(quality);
     }
@@ -203,6 +209,9 @@ public class WorldRenderer implements GLSurfaceView.Renderer{
 	
 	@Override
 	public void onDrawFrame(GL10 gl) {
+		if(fpsCounter.isDrawFPSCounter())
+			fpsCounter.logFrame();
+		
 		int worldShaderProgram = shaders.get(WORLD_SHADER).getShaderProgram();
 
 		GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT);
