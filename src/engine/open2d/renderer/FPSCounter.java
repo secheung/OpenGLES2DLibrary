@@ -5,12 +5,14 @@ import android.util.Log;
 public class FPSCounter {
 	long startTime = System.nanoTime();
 	int frames = 0;
+	int fps = 0;
 	boolean drawFPSCounter = false;
 	
 	public void logFrame() {
 		frames++;
 		if(System.nanoTime() - startTime >= 1000000000) {
-			Log.d("FPSCounter", "fps: " + frames);
+			//Log.d("FPSCounter", "fps: " + frames);
+			fps = frames;
 			frames = 0;
 			startTime = System.nanoTime();
 		}
@@ -20,7 +22,11 @@ public class FPSCounter {
 		return drawFPSCounter;
 	}
 
-	public void setDrawFPSCounter(boolean drawFPSCounter) {
-		this.drawFPSCounter = drawFPSCounter;
+	public void setTrackFPS(boolean trackFPS) {
+		this.drawFPSCounter = trackFPS;
+	}
+
+	public int getFPS() {
+		return fps;
 	}
 }

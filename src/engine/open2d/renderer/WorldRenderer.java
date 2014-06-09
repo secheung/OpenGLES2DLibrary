@@ -61,8 +61,12 @@ public class WorldRenderer implements GLSurfaceView.Renderer{
     	textureMap = new SparseIntArray();
     }
 
-    public void setDrawFPSCounter(boolean drawFPS){
-    	fpsCounter.setDrawFPSCounter(drawFPS);
+    public void setTrackFPS(boolean drawFPS){
+    	fpsCounter.setTrackFPS(drawFPS);
+    }
+
+    public int getFPS(){
+    	return fpsCounter.getFPS();
     }
     
     public void setTextureQuality(int quality){
