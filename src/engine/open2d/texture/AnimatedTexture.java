@@ -6,6 +6,7 @@ import android.util.Log;
 public class AnimatedTexture extends Texture{
 	public enum Playback{
 		PLAY,
+		PLAY_ONCE,
 		PAUSE,
 		REVERSE
 	}
@@ -37,14 +38,21 @@ public class AnimatedTexture extends Texture{
 	}
 	
 	public void incrementFrame(){
-		if(playback == Playback.PLAY){
+		if(playback == Playback.PAUSE){
+			return;
+		}
+
+		if(playback == Playback.PLAY || playback == Playback.PLAY_ONCE){
 			currentFrame += frameRate;
 		} else if(playback == Playback.REVERSE){
 			currentFrame -= frameRate;
 		}
 		
 		if(currentFrame >= totalFrames){
-			currentFrame = 1;
+			if(playback == Playback.PLAY)
+				currentFrame = 1;
+			else if(playback == Playback.PLAY_ONCE)
+				currentFrame = totalFrames - 1;
 			played = true;
 		} else if(currentFrame <= 0) {
 			currentFrame = totalFrames - 1;
