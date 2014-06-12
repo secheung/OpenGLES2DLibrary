@@ -5,10 +5,28 @@ import android.util.Log;
 
 public class AnimatedTexture extends Texture{
 	public enum Playback{
-		PLAY,
-		PLAY_ONCE,
-		PAUSE,
-		REVERSE
+		PLAY("play"),
+		PLAY_ONCE("play_once"),
+		PAUSE("pause"),
+		REVERSE("reverse");
+
+		public static Playback getPlaybackFromName(String name){
+			for(Playback playerState : Playback.values()){
+				if(name.equals(playerState.getName())){
+					return playerState;
+				}
+			}
+			return null;
+		}
+
+		String name;
+		Playback(String n){
+			name = n;
+		}
+
+		public String getName(){
+			return name;
+		}
 	}
 	
 	Playback playback;
