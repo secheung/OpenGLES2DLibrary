@@ -31,6 +31,7 @@ public class RendererTool {
 	}
 	
 	private final static int BYTES_PER_FLOAT = 4;
+	private final static float UNPROJECT_PRECISION = 3.0f;
 	
 	private float[] modelMatrix = new float[16];
 	private float[] viewMatrix = new float[16];
@@ -145,7 +146,7 @@ public class RendererTool {
 		float near = 1.0f;
 		float far = 10.0f;
 		
-		z=z-2.0f;
+		z=z-UNPROJECT_PRECISION;
 		normalizedInPoint[0] = (float) (x * 2.0f / viewportWidth - 1.0);
 		normalizedInPoint[1] = (float) (realY * 2.0f / viewportHeight - 1.0);
 		normalizedInPoint[2] = ((-(far+near)/(far-near))*z + ((-2*far*near)/(far-near)))/(-z);
