@@ -48,7 +48,7 @@ public class AnimatedTexture extends Texture{
 		this.frameWidth = 1.0f/rows;
 		this.frameHeight = 1.0f/columns;
 		this.totalFrames = rows*columns;
-		this.currentFrame = 1;
+		this.currentFrame = 0;
 		this.frameRate= 1;
 		
 		playback = Playback.PLAY;
@@ -68,7 +68,7 @@ public class AnimatedTexture extends Texture{
 		
 		if(currentFrame >= totalFrames){
 			if(playback == Playback.PLAY)
-				currentFrame = 1;
+				currentFrame = 0;
 			else if(playback == Playback.PLAY_ONCE)
 				currentFrame = totalFrames - 1;
 			played = true;
