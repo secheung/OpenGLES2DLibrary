@@ -55,7 +55,7 @@ public class AnimatedTexture extends Texture{
 		played = false;
 	}
 	
-	public void incrementFrame(){
+	public void animate(){
 		if(playback == Playback.PAUSE){
 			return;
 		}
@@ -67,10 +67,11 @@ public class AnimatedTexture extends Texture{
 		}
 		
 		if(currentFrame >= totalFrames){
-			if(playback == Playback.PLAY)
+			if(playback == Playback.PLAY){
 				currentFrame = 0;
-			else if(playback == Playback.PLAY_ONCE)
+			}else if(playback == Playback.PLAY_ONCE){
 				currentFrame = totalFrames - 1;
+			}
 			played = true;
 		} else if(currentFrame <= 0) {
 			currentFrame = totalFrames - 1;
@@ -79,7 +80,7 @@ public class AnimatedTexture extends Texture{
 	}
 	
 	public void setFrame(int frame){
-		if(currentFrame >= totalFrames || currentFrame <= 0){
+		if(currentFrame >= totalFrames || currentFrame < 0){
 			Log.w("Animated Texture", "set frame is out of animated bounds");
 			return;
 		}
@@ -96,7 +97,7 @@ public class AnimatedTexture extends Texture{
 	}
 	
 	public void resetAnimation(){
-		currentFrame = 1;
+		currentFrame = 0;
 		played = false;
 		frameRate = 1;
 	}

@@ -225,10 +225,12 @@ public class WorldRenderer implements GLSurfaceView.Renderer{
 
 		synchronized(drawObjects){
 			List<DrawObject> sortedList = new ArrayList<DrawObject>(drawObjects);
-			Collections.sort(sortedList, rendererTool.zSorter);
-			for(DrawObject drawObject : sortedList){
-				if(drawObject.isDrawEnabled()){
-					drawShape(drawObject);
+			if(!sortedList.isEmpty()){
+				Collections.sort(sortedList, rendererTool.zSorter);
+				for(DrawObject drawObject : sortedList){
+					if(drawObject.isDrawEnabled()){
+						drawShape(drawObject);
+					}
 				}
 			}
 		}

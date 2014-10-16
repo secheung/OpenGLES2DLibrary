@@ -121,7 +121,7 @@ public class Plane extends DrawObject{
 	
 	public void update(){
 		if(texture instanceof AnimatedTexture){
-			((AnimatedTexture) texture).incrementFrame();
+			((AnimatedTexture) texture).animate();
 		}
 	}
 	
@@ -150,6 +150,15 @@ public class Plane extends DrawObject{
 		}
 	}
 
+	public void setPlayed(boolean played) {
+		if(texture instanceof AnimatedTexture){
+			((AnimatedTexture)texture).setPlayed(played);
+		} else {
+			Log.w("World Renderer","this texture is not an animated texture");
+			return;
+		}
+	}
+	
 	public boolean isPlayed() {
 		if(texture instanceof AnimatedTexture){
 			return ((AnimatedTexture)texture).isPlayed();
