@@ -61,6 +61,14 @@ public class WorldRenderer implements GLSurfaceView.Renderer{
     	textureMap = new SparseIntArray();
     }
 
+    public int getScreenWidth(){
+    	return rendererTool.getViewportWidth();
+    }
+    
+    public int getScreenHeight(){
+    	return rendererTool.getViewportHeight();
+    }
+    
     public void setTrackFPS(boolean drawFPS){
     	fpsCounter.setTrackFPS(drawFPS);
     }
