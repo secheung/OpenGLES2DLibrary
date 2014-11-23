@@ -61,8 +61,16 @@ public class WorldRenderer implements GLSurfaceView.Renderer{
     	textureMap = new SparseIntArray();
     }
 
+    public void setScreenWidth(int width){
+    	rendererTool.setViewportWidth(width);
+    }
+    
     public int getScreenWidth(){
     	return rendererTool.getViewportWidth();
+    }
+    
+    public void setScreenHeight(int height){
+    	rendererTool.setViewportHeight(height);
     }
     
     public int getScreenHeight(){
@@ -96,6 +104,14 @@ public class WorldRenderer implements GLSurfaceView.Renderer{
 		synchronized(drawObjects){
 			drawObjects.remove(shape);
 		}
+	}
+	
+	public boolean hasDrawShape(DrawObject shape){
+		boolean hasObj = false;
+		synchronized(drawObjects){
+			hasObj = drawObjects.contains(shape);
+		}
+		return hasObj;
 	}
 	
     public void addCustomShader(String ref, int vertResourceId, int fragResourceId, String...attributes){
