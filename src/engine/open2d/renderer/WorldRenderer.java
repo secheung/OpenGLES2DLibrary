@@ -231,8 +231,15 @@ public class WorldRenderer implements GLSurfaceView.Renderer{
 		}
 	}
 	
+	//for manual z
+	public float[] getUnprojectedPoints(float x, float y, float zModel){
+		return rendererTool.screenUnProjection(x,y,zModel);
+	}
+
+	//for draw objects
 	public float[] getUnprojectedPoints(float x, float y, DrawObject drawObj){
-		return rendererTool.screenUnProjection(x,y,drawObj.getTranslationZ());
+		float zModel = drawObj.getTranslationZ() + Plane.DEFAULT_Z_DISTANCE;//Since only planes exists and translations is not same as actual coord. Should generalize later
+		return rendererTool.screenUnProjection(x,y,zModel);
 	}
 	
 	@Override
@@ -317,6 +324,10 @@ public class WorldRenderer implements GLSurfaceView.Renderer{
 	@Override
 	public void onSurfaceChanged(GL10 gl, int width, int height) {
 		GLES20.glViewport(0, 0, width, height);
+		setupFrustrum(width,height);
+	}
+
+	public void setupFrustrum(int width, int height){
 
 		rendererTool.setViewportWidth(width);
 		rendererTool.setViewportHeight(height);

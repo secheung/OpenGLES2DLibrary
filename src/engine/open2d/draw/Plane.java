@@ -12,7 +12,7 @@ public class Plane extends DrawObject{
 	public final static int TEXTURE_DATA_SIZE = 2;
 	public final static int USE_TEXTURE_SIZE = 1;
 	
-	private final static float DEFAULT_Z_DISTANCE = -2.0f;
+	public final static float DEFAULT_Z_DISTANCE = -2.0f;
 	
 	Texture texture;
 	private float useTexture;

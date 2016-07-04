@@ -131,13 +131,12 @@ public class RendererTool {
 		//GLES20.glEnableVertexAttribArray(handle);
 	}
 	
-	public float[] screenUnProjection(float x, float y, float z){
-//		float[] modelView = getMVMatrix();  // use model view if want to include translation applied to models
-		float[] projectedPos = new float[4];
-		int[] viewport = new int[4];
+	public float[] screenUnProjection(float xScreen, float yScreen, float zModel){
+		float[] modelPos = new float[4];
+//		int[] viewport = new int[4];
+//		GLES20.glGetIntegerv(GLES20.GL_VIEWPORT, viewport, 0);//not used here if needed
 		
-		GLES20.glGetIntegerv(GLES20.GL_VIEWPORT, viewport, 0);
-		float realY = viewportHeight - (int) y;
+		float realY = viewportHeight - (int) yScreen;//need to flip since in screen coord 0 is on top
 		
 		float[] invertedMatrix = new float[16];
 		float[] transformMatrix = new float[16];
@@ -146,10 +145,15 @@ public class RendererTool {
 		float near = 1.0f;
 		float far = 10.0f;
 		
-		z=z-UNPROJECT_PRECISION;
-		normalizedInPoint[0] = (float) (x * 2.0f / viewportWidth - 1.0);
+		//setup zModel in eyeSpace
+		float[] zModelVec = {0,0,zModel,1};
+		float[] zEye = new float[4];
+		Matrix.multiplyMV(zEye, 0, viewMatrix, 0, zModelVec, 0);
+
+		//convert x,y,z to ndc space
+		normalizedInPoint[0] = (float) (xScreen * 2.0f / viewportWidth - 1.0);
 		normalizedInPoint[1] = (float) (realY * 2.0f / viewportHeight - 1.0);
-		normalizedInPoint[2] = ((-(far+near)/(far-near))*z + ((-2*far*near)/(far-near)))/(-z);
+		normalizedInPoint[2] = ((-(far+near)/(far-near))*zEye[2] + ((-2*far*near)/(far-near)))/(-zEye[2]);//converts eye space z to ndc z
 		normalizedInPoint[3] = 1.0f;
 		
 		Matrix.multiplyMM(	transformMatrix, 0,
@@ -159,22 +163,22 @@ public class RendererTool {
 		Matrix.invertM(	invertedMatrix, 0,
 						transformMatrix, 0);
 		
-		Matrix.multiplyMV(	projectedPos, 0,
+		Matrix.multiplyMV(	modelPos, 0,
 							invertedMatrix, 0,
 							normalizedInPoint, 0);
 		
-		if (projectedPos[3] == 0.0){
+		if (modelPos[3] == 0.0){
 			Log.e("World coords", "ERROR!");
 			return null;
 		}
 
 		
-		projectedPos[0] = projectedPos[0] / projectedPos[3];
-		projectedPos[1] = projectedPos[1] / projectedPos[3];
-		projectedPos[2] = projectedPos[2] / projectedPos[3];
-		projectedPos[3] = projectedPos[3] / projectedPos[3];
+		modelPos[0] = modelPos[0] / modelPos[3];
+		modelPos[1] = modelPos[1] / modelPos[3];
+		modelPos[2] = modelPos[2] / modelPos[3];
+		modelPos[3] = modelPos[3] / modelPos[3];
 		
-		return projectedPos;
+		return modelPos;
 	}
 	
 	public float[] screenProjectPlane(Plane plane){
@@ -189,18 +193,21 @@ public class RendererTool {
 		
 		float[] modelView = getMVMatrix();
 		
+		//project top right corner
 		GLU.gluProject(		posData[0], posData[1], posData[2],
 							modelView, 0,
 							projectionMatrix, 0,
 							viewport, 0,
 							pos1, 0);
 		
+		//project top left corner
 		GLU.gluProject(		posData[3], posData[4], posData[5],
 							modelView, 0,
 							projectionMatrix, 0,
 							viewport, 0,
 							pos2, 0);
 		
+		//project bottom left corner
 		GLU.gluProject(		posData[6], posData[7], posData[8],
 							modelView, 0,
 							projectionMatrix, 0,
@@ -210,7 +217,7 @@ public class RendererTool {
 		float width = pos1[0] - pos3[0];
 		float height = pos1[1] - pos3[1];
 		float depth = pos3[2];
-		float[] set = {pos3[0],pos3[1],width,height,depth};
+		float[] set = {pos3[0],pos3[1],width,height,depth};//returns bottom left corner of plane
 		
 		return set;
 		
