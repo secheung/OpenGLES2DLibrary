@@ -15,6 +15,7 @@ import javax.microedition.khronos.opengles.GL10;
 import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+import android.opengl.Matrix;
 import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.MotionEvent;
@@ -22,6 +23,8 @@ import engine.open2d.draw.DrawObject;
 import engine.open2d.draw.Plane;
 import engine.open2d.shader.Shader;
 import engine.open2d.shader.ShaderTool;
+import engine.open2d.text.GLText;
+import engine.open2d.text.Program;
 import engine.open2d.texture.Texture;
 import engine.open2d.texture.TextureTool;
 
@@ -49,6 +52,8 @@ public class WorldRenderer implements GLSurfaceView.Renderer{
 	private LinkedHashSet<DrawObject> drawObjects;
 	private SparseIntArray textureMap;
 
+	GLText glText;
+	
     public WorldRenderer(final Context activityContext) {
     	this.activityContext = activityContext;
     	rendererTool = new RendererTool();
@@ -139,10 +144,11 @@ public class WorldRenderer implements GLSurfaceView.Renderer{
 
 		GLES20.glClearColor(bgRed, bgGreen, bgBlue, bgAlpha);
 
-		GLES20.glEnable(GLES20.GL_CULL_FACE);
-		GLES20.glEnable(GLES20.GL_DEPTH_TEST);
+		//GLES20.glEnable(GLES20.GL_CULL_FACE);//disabled for text rendering
+		//GLES20.glEnable(GLES20.GL_DEPTH_TEST);//disabled for text rendering
 		GLES20.glEnable(GLES20.GL_BLEND);
-		GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+		//GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);//disabled for text rendering
+		GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA);
 
 		rendererTool.setLookAt(	0,
 								0.0f, 0.0f, 0.0f,
@@ -151,6 +157,13 @@ public class WorldRenderer implements GLSurfaceView.Renderer{
 
 		buildShaders();
 		buildObjectTextures();
+		
+		// Create the GLText
+		glText = new GLText(activityContext.getAssets());
+
+		// Load the font from file (set size + padding), creates the texture
+		// NOTE: after a successful call to this the font is ready for rendering!
+		glText.load( "Roboto-Regular.ttf", 14, 2, 2 );  // Create Font (Height: 14 Pixels / X+Y Padding 2 Pixels)
 	}
 	
 	private void buildShaders(){
@@ -242,6 +255,10 @@ public class WorldRenderer implements GLSurfaceView.Renderer{
 		return rendererTool.screenUnProjection(x,y,zModel);
 	}
 	
+	public float[] getProjectedPoint(float x, float y, float z){
+		return rendererTool.screenProjection(x, y, z);
+	}
+	
 	@Override
 	public void onDrawFrame(GL10 gl) {
 		if(fpsCounter.isDrawFPSCounter())
@@ -253,7 +270,7 @@ public class WorldRenderer implements GLSurfaceView.Renderer{
 		GLES20.glUseProgram(worldShaderProgram);
 
 		rendererTool.setHandles(shaders.get(WORLD_SHADER));
-
+		//setCamera(0.0f, 1.0f, 2.0f);
 		synchronized(drawObjects){
 			List<DrawObject> sortedList = new ArrayList<DrawObject>(drawObjects);
 			if(!sortedList.isEmpty()){
@@ -265,6 +282,29 @@ public class WorldRenderer implements GLSurfaceView.Renderer{
 				}
 			}
 		}
+		
+		float[] orthoViewMatrix = new float[16];//text uses ortho view matrix...for some reason...weird...
+		float[] mVPMatrix = new float[16];
+		getOrthoView(getScreenWidth(), getScreenHeight(),orthoViewMatrix);
+		Matrix.multiplyMM(mVPMatrix, 0, rendererTool.getProjectionMatrix(), 0, orthoViewMatrix, 0);
+		
+		glText.setScale(2.0f);
+		// TEST: render the entire font texture
+		glText.drawTexture( getScreenWidth()/2, getScreenHeight()/2, mVPMatrix);            // Draw the Entire Texture
+		
+		// TEST: render some strings with the font
+		glText.begin( 1.0f, 1.0f, 1.0f, 1.0f, mVPMatrix );         // Begin Text Rendering (Set Color WHITE)
+		glText.drawC("Test String 3D!", 0f, -50f, 0f, 0, 0, 0);
+		glText.drawC( "Test String :)", 0, 0, 0 );          // Draw Test String
+		glText.draw( "Diagonal 1", 40, 40, 40);                // Draw Test String
+		glText.draw( "Column 1", 100, 100, 90);              // Draw Test String
+		glText.end();                                   // End Text Rendering
+		
+		glText.begin( 0.0f, 0.0f, 1.0f, 1.0f, mVPMatrix );         // Begin Text Rendering (Set Color BLUE)
+		glText.draw( "More Lines...", 50, 200 );        // Draw Test String
+		glText.draw( "The End.", 50, 200 + glText.getCharHeight(), 180);  // Draw Test String
+		glText.end();                                         // End Text Rendering
+		
 	}
 
 	private void drawShape(DrawObject drawObject){
@@ -272,8 +312,6 @@ public class WorldRenderer implements GLSurfaceView.Renderer{
 		float[] colorData = drawObject.getColorData();
 		float[] normalData = drawObject.getNormalData();
 
-		//TODO Textures
-		//TODO MAKE SO NOT HARDCODED
 		Map<String,Integer> handles = rendererTool.getHandles();
 		
 		if(drawObject instanceof Plane){
@@ -341,5 +379,9 @@ public class WorldRenderer implements GLSurfaceView.Renderer{
 		final float far = 10.0f;
 
 		rendererTool.setFrustum(0, left, right, bottom, top, near, far);
+	}
+	
+	public void getOrthoView(int width, int height, float[] storeMatrix){
+		rendererTool.getOrthoView(width, height,storeMatrix);
 	}
 }

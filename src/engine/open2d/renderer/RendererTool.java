@@ -181,6 +181,21 @@ public class RendererTool {
 		return modelPos;
 	}
 	
+	public float[] screenProjection(float x, float y, float z){
+		int[] viewport = {0,0,viewportWidth,viewportHeight};
+		float[] modelView = getMVMatrix();
+		
+		float[] pos = new float[3];
+		
+		GLU.gluProject(		x, y, z,
+							modelView, 0,
+							projectionMatrix, 0,
+							viewport, 0,
+							pos, 0);
+		
+		return pos;
+	}
+	
 	public float[] screenProjectPlane(Plane plane){
 		int[] viewport = {0,0,viewportWidth,viewportHeight};
 		
@@ -233,6 +248,16 @@ public class RendererTool {
 		Matrix.frustumM(projectionMatrix, offset, left, right, bottom, top, near, far);
 	}
 
+	public void getOrthoView(int width, int height, float[] storeMatrix){
+		int useForOrtho = Math.min(width, height);
+		
+		Matrix.orthoM(storeMatrix, 0,
+					-useForOrtho/2,
+					useForOrtho/2,
+					-useForOrtho/2,
+					useForOrtho/2, 0.1f, 100f);
+	}
+	
 	public void translateModelMatrix(float changeX, float changeY, float changeZ){
 		Matrix.setIdentityM(modelMatrix, 0);
 		Matrix.translateM(modelMatrix, 0, changeX, changeY, changeZ);
