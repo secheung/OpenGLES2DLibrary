@@ -274,7 +274,7 @@ public class WorldRenderer implements GLSurfaceView.Renderer{
 		synchronized(drawObjects){
 			List<DrawObject> sortedList = new ArrayList<DrawObject>(drawObjects);
 			if(!sortedList.isEmpty()){
-				Collections.sort(sortedList, rendererTool.zSorter);
+				//Collections.sort(sortedList, rendererTool.zSorter);
 				for(DrawObject drawObject : sortedList){
 					if(drawObject.isDrawEnabled()){
 						drawShape(drawObject);
@@ -304,6 +304,13 @@ public class WorldRenderer implements GLSurfaceView.Renderer{
 		glText.draw( "More Lines...", 50, 200 );        // Draw Test String
 		glText.draw( "The End.", 50, 200 + glText.getCharHeight(), 180);  // Draw Test String
 		glText.end();                                         // End Text Rendering
+		
+		if(fpsCounter.isDrawFPSCounter()){
+			glText.begin( 1.0f, 1.0f, 1.0f, 1.0f, mVPMatrix );
+			glText.draw( Integer.toString(fpsCounter.getFPS()), -getScreenWidth()/2, 0);
+			glText.end();
+		}
+			
 		
 	}
 

@@ -19,7 +19,7 @@ import android.opengl.Matrix;
 
 //import BatchTextProgram;
 //import Program;
-
+//from http://fractiousg.blogspot.ca/2012/04/rendering-text-in-opengl-on-android.html?m=1
 public class GLText {
 
 	//--Constants--//
