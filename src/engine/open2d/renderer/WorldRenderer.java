@@ -24,6 +24,7 @@ import engine.open2d.draw.Plane;
 import engine.open2d.shader.Shader;
 import engine.open2d.shader.ShaderTool;
 import engine.open2d.text.GLText;
+import engine.open2d.text.Label;
 import engine.open2d.text.Program;
 import engine.open2d.texture.Texture;
 import engine.open2d.texture.TextureTool;
@@ -52,6 +53,8 @@ public class WorldRenderer implements GLSurfaceView.Renderer{
 	private LinkedHashSet<DrawObject> drawObjects;
 	private SparseIntArray textureMap;
 
+	private LinkedHashSet<Label> drawTexts;
+	
 	GLText glText;
 	
     public WorldRenderer(final Context activityContext) {
@@ -64,6 +67,8 @@ public class WorldRenderer implements GLSurfaceView.Renderer{
     	shaders = new LinkedHashMap<String,Shader>();
     	drawObjects = new LinkedHashSet<DrawObject>();
     	textureMap = new SparseIntArray();
+    	
+    	drawTexts = new LinkedHashSet<Label>();
     }
 
     public void setScreenWidth(int width){
@@ -94,6 +99,7 @@ public class WorldRenderer implements GLSurfaceView.Renderer{
     	textureTool.setTextureQuality(quality);
     }
     
+    //draw shape interface
 	public void addDrawShape(DrawObject shape){
 		if(drawObjects.contains(shape)){
 			Log.w(LOG_PREFIX, ITEM_EXISTS_WARNING+" [shape : "+shape.name+"]");
@@ -118,6 +124,38 @@ public class WorldRenderer implements GLSurfaceView.Renderer{
 		}
 		return hasObj;
 	}
+	
+	public void updateDrawText(Label label){
+		//drawTexts.;
+	}
+	///////////////////////////////////////
+	
+	//draw text interface
+	public void addDrawText(Label label){
+		if(drawTexts.contains(label)){
+			Log.w(LOG_PREFIX, ITEM_EXISTS_WARNING+" [shape : "+label.getText()+" with id +"+label.getUID()+"]");
+			return;
+		}
+
+		synchronized(drawTexts){
+			drawTexts.add(label);
+		}
+    }
+	
+	public void removeDrawLabel(Label label){
+		synchronized(label){
+			drawTexts.remove(label);
+		}
+	}
+	
+	public boolean hasDrawLabel(Label label){
+		boolean hasLabel = false;
+		synchronized(drawTexts){
+			hasLabel = drawTexts.contains(label);
+		}
+		return hasLabel;
+	}
+	/////////////////////////////////////////
 	
     public void addCustomShader(String ref, int vertResourceId, int fragResourceId, String...attributes){
     	if(shaders.containsKey(ref)){
@@ -283,27 +321,14 @@ public class WorldRenderer implements GLSurfaceView.Renderer{
 			}
 		}
 		
+		
+		drawText();
+		
+		
 		float[] orthoViewMatrix = new float[16];//text uses ortho view matrix...for some reason...weird...
 		float[] mVPMatrix = new float[16];
 		getOrthoView(getScreenWidth(), getScreenHeight(),orthoViewMatrix);
 		Matrix.multiplyMM(mVPMatrix, 0, rendererTool.getProjectionMatrix(), 0, orthoViewMatrix, 0);
-		
-		glText.setScale(2.0f);
-		// TEST: render the entire font texture
-		glText.drawTexture( getScreenWidth()/2, getScreenHeight()/2, mVPMatrix);            // Draw the Entire Texture
-		
-		// TEST: render some strings with the font
-		glText.begin( 1.0f, 1.0f, 1.0f, 1.0f, mVPMatrix );         // Begin Text Rendering (Set Color WHITE)
-		glText.drawC("Test String 3D!", 0f, -50f, 0f, 0, 0, 0);
-		glText.drawC( "Test String :)", 0, 0, 0 );          // Draw Test String
-		glText.draw( "Diagonal 1", 40, 40, 40);                // Draw Test String
-		glText.draw( "Column 1", 100, 100, 90);              // Draw Test String
-		glText.end();                                   // End Text Rendering
-		
-		glText.begin( 0.0f, 0.0f, 1.0f, 1.0f, mVPMatrix );         // Begin Text Rendering (Set Color BLUE)
-		glText.draw( "More Lines...", 50, 200 );        // Draw Test String
-		glText.draw( "The End.", 50, 200 + glText.getCharHeight(), 180);  // Draw Test String
-		glText.end();                                         // End Text Rendering
 		
 		if(fpsCounter.isDrawFPSCounter()){
 			glText.begin( 1.0f, 1.0f, 1.0f, 1.0f, mVPMatrix );
@@ -357,6 +382,44 @@ public class WorldRenderer implements GLSurfaceView.Renderer{
 
 	    GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 6);
 
+	}
+	
+	private void drawText(){
+		float[] orthoViewMatrix = new float[16];//text uses ortho view matrix...for some reason...weird...
+		float[] mVPMatrix = new float[16];
+		getOrthoView(getScreenWidth(), getScreenHeight(),orthoViewMatrix);
+		Matrix.multiplyMM(mVPMatrix, 0, rendererTool.getProjectionMatrix(), 0, orthoViewMatrix, 0);
+		
+		glText.setScale(2.0f);
+		// TEST: render the entire font texture
+		//glText.drawTexture( getScreenWidth()/2, getScreenHeight()/2, mVPMatrix);            // Draw the Entire Texture
+		
+		// TEST: render some strings with the font
+		//glText.begin( 1.0f, 1.0f, 1.0f, 1.0f, mVPMatrix );         // Begin Text Rendering (Set Color WHITE)
+		//glText.drawC("Test String 3D!", 0f, -50f, 0f, 0, 0, 0);
+		//glText.drawC( "Test String :)", 0, 0, 0 );          // Draw Test String
+		//glText.draw( "Diagonal 1", 40, 40, 40);                // Draw Test String
+		//glText.draw( "Column 1", 100, 100, 90);              // Draw Test String
+		//glText.end();                                   // End Text Rendering
+		
+		//glText.begin( 0.0f, 0.0f, 1.0f, 1.0f, mVPMatrix );         // Begin Text Rendering (Set Color BLUE)
+		//glText.draw( "More Lines...", 50, 200 );        // Draw Test String
+		//glText.draw( "The End.", 50, 200 + glText.getCharHeight(), 180);  // Draw Test String
+		//glText.end();                                         // End Text Rendering
+		
+		glText.begin( 1.0f, 1.0f, 1.0f, 1.0f, mVPMatrix );         // Begin Text Rendering (Set Color WHITE)
+		synchronized(drawTexts){
+			if(!drawTexts.isEmpty()){
+				Iterator<Label> iterLabels = drawTexts.iterator();
+				while(iterLabels.hasNext()){
+					Label lab = iterLabels.next();
+					if(lab.isVisible())
+						glText.draw( lab.getText(), lab.getLocation().x, lab.getLocation().y);              // Draw Test String
+				}
+			}
+		}
+		
+		glText.end();
 	}
 	
 	public void setCamera(float x, float y, float z){
